@@ -5,4 +5,4 @@ import helpers as hp
 st.header("Hello")
 
 recipies = hp.getRecipies()
-st.table(recipies)
+st.dataframe(recipies)
