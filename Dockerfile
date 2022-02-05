@@ -16,6 +16,8 @@ WORKDIR /app
 COPY app.py app.py
 COPY helpers.py helpers.py
 
+COPY database.sqlite database.sqlite
+
 EXPOSE 8501
 ENTRYPOINT ["streamlit", "run"]
 CMD ["app.py"]
