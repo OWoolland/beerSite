@@ -15,6 +15,7 @@ WORKDIR /app
 
 COPY app.py app.py
 COPY helpers.py helpers.py
+COPY queries.py queries.py
 
 COPY database.sqlite database.sqlite
 
