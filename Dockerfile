@@ -20,5 +20,4 @@ COPY queries.py queries.py
 COPY database.sqlite database.sqlite
 
 EXPOSE 8501
-ENTRYPOINT ["streamlit", "run"]
-CMD ["app.py"]
+ENTRYPOINT ["streamlit", "run", "app.py"]
