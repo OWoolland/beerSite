@@ -10,24 +10,38 @@ recipeRounding = {
     'Quantity (kg)': '{:.2f}'
     }
 
-columns = {
-    "recipe.id"          : "ID",
-    "recipe.name"        : "Name",
-    "brewnote.brewDate"  : "Date Brewed",
-    "brewnote.og"        : "OG",
-    "brewnote.abv"       : "ABV %",
-    "group_concat(fermentable.name || ' [' || fermentable.amount || ' kg]',', ')" : "Grain Bill"
+main_columns = {
+    "recipe.id"         : "ID",
+    "recipe.name"       : "Name",
+    "brewnote.brewDate" : "Date Brewed",
+    "brewnote.og"       : "OG",
+    "brewnote.abv"      : "ABV %"
     }
+
+ingredient_columns = {
+    "group_concat(fermentable.name || ' [' || fermentable.amount || ' kg]',', ')" : "Fermentable",
+    "group_concat(hop.name || ' [' || hop.amount || ' kg @ ' || hop.time || ']')" : "Hop"
+}
 
 def getRecipies():
     connection = sql.connect('database.sqlite')
     cursor = connection.cursor()
 
-    displayFields = ','.join(columns.keys())
-    query = queries.recipeQuery(displayFields)
+    displayFields = ','.join(main_columns.keys())
 
-    recipies = pd.read_sql_query(query, connection)
-    recipies.columns = columns.values()
+    query = queries.mainQuery(displayFields)
+    main = pd.read_sql_query(query, connection)
+    main.columns = main_columns.values()
+
+    recipies = main
+    for ingredient in ingredient_columns.items():
+        query = queries.ingredientQuery(ingredient)
+        result = pd.read_sql_query(query, connection)
+
+        recipies = recipies.join(result)
+
+    
+    
 
     recipies['Date Brewed'] = pd.to_datetime(recipies['Date Brewed'])
     recipies['Date Brewed'] = recipies['Date Brewed'].dt.strftime('%Y-%m-%d')
