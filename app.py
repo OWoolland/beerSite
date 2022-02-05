@@ -7,3 +7,4 @@ st.header("Hello")
 
 recipies = hp.getRecipies()
 st.dataframe(recipies)
+st.table(recipies)

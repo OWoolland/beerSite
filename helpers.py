@@ -6,15 +6,17 @@ import queries
 
 recipeRounding = {
     'OG': '{:.3f}',
-    'ABV %': '{:.1f}'
+    'ABV %': '{:.1f}',
+    'Quantity (kg)': '{:.2f}'
     }
 
 columns = {
-    "recipe.id"         : "ID",
-    "recipe.name"       : "Name",
-    "brewnote.brewDate" : "Date Brewed",
-    "brewnote.og"       : "OG",
-    "brewnote.abv"      : "ABV %"
+    "recipe.id"          : "ID",
+    "recipe.name"        : "Name",
+    "brewnote.brewDate"  : "Date Brewed",
+    "brewnote.og"        : "OG",
+    "brewnote.abv"       : "ABV %",
+    "group_concat(fermentable.name || ' [' || fermentable.amount || ' kg]',', ')" : "Grain Bill"
     }
 
 def getRecipies():
