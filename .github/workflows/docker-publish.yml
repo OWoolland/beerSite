@@ -23,7 +23,7 @@ env:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: python:3.8
     permissions:
       contents: read
       packages: write
