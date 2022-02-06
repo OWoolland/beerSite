@@ -11,10 +11,10 @@ recipeRounding = {
     }
 
 main_columns = {
-    "recipe.id"         : "ID",
+    #"recipe.id"         : "ID",
     "recipe.name"       : "Name",
     "brewnote.brewDate" : "Date Brewed",
-    "brewnote.og"       : "OG",
+    #"brewnote.og"       : "OG",
     "brewnote.abv"      : "ABV %"
     }
 
@@ -22,11 +22,12 @@ main_columns = {
 #     'Fermentable' : ['name',' [','amount', etc] 
 # }
 
+delim = "'<br> '"
 ingredient_columns = {
-    "group_concat(fermentable.name || ' [' || fermentable.amount || ' kg]',', ')"       : "Fermentable",
-    "group_concat(hop.name || ' [' || (hop.amount*1000) || ' g @ ' || hop.time || ']')" : "Hop",
-    "group_concat(misc.name || ' [' || misc.use|| ' ' || (misc.amount*1000) || ' g]')"  : "Misc",
-    "group_concat(yeast.name)" : "Yeast",
+    f"group_concat(fermentable.name || ' [' || fermentable.amount || ' kg]',{delim})"            : "Fermentable",
+    f"group_concat(hop.name || ' [' || (hop.amount*1000) || ' g @ ' || hop.time || ']',{delim})" : "Hop",
+    f"group_concat(misc.name || ' [' || misc.use|| ' ' || (misc.amount*1000) || ' g]',{delim})"  : "Misc",
+    f"group_concat(yeast.name,{delim})" : "Yeast",
 }
 
 def getRecipies():
