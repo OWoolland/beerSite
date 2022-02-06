@@ -16,9 +16,9 @@ def ingredientQuery(ingredient):
     
     query = f"""SELECT {fields}
 from recipe
-INNER JOIN brewnote ON recipe.id=brewnote.recipe_id
-INNER JOIN {type}_in_recipe ON {type}_in_recipe.recipe_id=recipe.id
-INNER JOIN {type} ON {type}.id={type}_in_recipe.{type}_id
+LEFT JOIN brewnote ON recipe.id=brewnote.recipe_id
+LEFT JOIN {type}_in_recipe ON {type}_in_recipe.recipe_id=recipe.id
+LEFT JOIN {type} ON {type}.id={type}_in_recipe.{type}_id
 WHERE
 NOT recipe.folder='brewtarget'
 AND recipe.deleted='0'
