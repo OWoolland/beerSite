@@ -18,12 +18,22 @@ main_columns = {
     "brewnote.abv"      : "ABV %"
     }
 
+# intregients = {
+#     'Fermentable' : ['name',' [','amount', etc] 
+# }
+
 ingredient_columns = {
-    "group_concat(fermentable.name || ' [' || fermentable.amount || ' kg]',', ')" : "Fermentable",
-    "group_concat(hop.name || ' [' || hop.amount || ' kg @ ' || hop.time || ']')" : "Hop"
+    "group_concat(fermentable.name || ' [' || fermentable.amount || ' kg]',', ')"       : "Fermentable",
+    "group_concat(hop.name || ' [' || (hop.amount*1000) || ' g @ ' || hop.time || ']')" : "Hop",
+    "group_concat(misc.name || ' [' || misc.use|| ' ' || (misc.amount*1000) || ' g]')"  : "Misc",
+    "group_concat(yeast.name)" : "Yeast",
 }
 
 def getRecipies():
+
+    # --------------------------------------------------------------------------
+    # Connect to database
+    
     connection = sql.connect('database.sqlite')
     cursor = connection.cursor()
 
@@ -31,17 +41,17 @@ def getRecipies():
 
     query = queries.mainQuery(displayFields)
     main = pd.read_sql_query(query, connection)
-    main.columns = main_columns.values()
-
+    column_names = list(main_columns.values())
+    
     recipies = main
     for ingredient in ingredient_columns.items():
         query = queries.ingredientQuery(ingredient)
         result = pd.read_sql_query(query, connection)
 
         recipies = recipies.join(result)
+        column_names.append(ingredient[1])
 
-    
-    
+    recipies.columns = column_names
 
     recipies['Date Brewed'] = pd.to_datetime(recipies['Date Brewed'])
     recipies['Date Brewed'] = recipies['Date Brewed'].dt.strftime('%Y-%m-%d')
