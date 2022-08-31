@@ -1,4 +1,3 @@
-import streamlit as st
 import sqlite3 as sql
 import pandas as pd
 
@@ -35,7 +34,7 @@ def getRecipies():
     # --------------------------------------------------------------------------
     # Connect to database
     
-    connection = sql.connect('database.sqlite')
+    connection = sql.connect('/srv/http/beerSite/database.sqlite')
     cursor = connection.cursor()
 
     displayFields = ','.join(main_columns.keys())
@@ -57,7 +56,7 @@ def getRecipies():
     recipies['Date Brewed'] = pd.to_datetime(recipies['Date Brewed'])
     recipies['Date Brewed'] = recipies['Date Brewed'].dt.strftime('%Y-%m-%d')
 
-    recipies = recipies.style.format(recipeRounding)
+    recipies = recipies.style.format(recipeRounding).render()
 
     connection.close()
     return recipies
