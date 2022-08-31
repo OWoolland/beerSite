@@ -1,7 +1,8 @@
 import sqlite3 as sql
 import pandas as pd
 
-import queries 
+import queries
+import minio_helpers as mh
 
 recipeRounding = {
     'OG': '{:.3f}',
@@ -32,9 +33,14 @@ ingredient_columns = {
 def getRecipies():
 
     # --------------------------------------------------------------------------
+    # Get database from minio
+
+    mh.getDatabaseFile()
+    
+    # --------------------------------------------------------------------------
     # Connect to database
     
-    connection = sql.connect('/srv/http/beerSite/database.sqlite')
+    connection = sql.connect('./database.sqlite')
     cursor = connection.cursor()
 
     displayFields = ','.join(main_columns.keys())
