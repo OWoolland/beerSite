@@ -1,11 +1,13 @@
 from minio import Minio
 from minio.error import S3Error
+from minio_secrets import *
 
 def getMinioClient():
+    print(access_key)
     client = Minio(
         f'localhost:9000',
-        access_key='voQhnSTDPz992mXC',
-        secret_key='9HM93xMWuW8qf7f5Wbhm0YfOckYNDHE1',
+        access_key=access_key,
+        secret_key=secret_key,
         secure=False
     )
     return client
