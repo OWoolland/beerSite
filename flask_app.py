@@ -3,9 +3,9 @@ import bs4
 
 import helpers as hp
 
-app = Flask(__name__)
+beerSite = Flask(__name__)
 
-@app.route('/')
+@beerSite.route('/')
 def index():
    recipies = hp.getRecipies()
 
@@ -19,4 +19,4 @@ def index():
    return str(soup)
 
 if __name__ == "__main__":
-   app.run()
+   beerSite.run(host='0.0.0.0', port=5000)
