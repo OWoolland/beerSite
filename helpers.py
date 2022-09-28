@@ -62,7 +62,7 @@ def getRecipies():
     recipies['Date Brewed'] = pd.to_datetime(recipies['Date Brewed'])
     recipies['Date Brewed'] = recipies['Date Brewed'].dt.strftime('%Y-%m-%d')
 
-    recipies = recipies.style.format(recipeRounding).render()
+    recipies = recipies.style.format(recipeRounding).to_html()
 
     connection.close()
     return recipies
