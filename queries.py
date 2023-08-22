@@ -2,10 +2,9 @@ def mainQuery(fields):
     query = f"""SELECT {fields} from recipe
 INNER JOIN brewnote ON recipe.id=brewnote.recipe_id
 WHERE
-NOT recipe.folder='brewtarget'
-AND recipe.deleted='0'
-AND brewnote.deleted='0'
-GROUP BY brewnote.id
+recipe.deleted='0'
+AND brewnote.display='1'
+GROUP BY brewnote.id, recipe.name
 ORDER BY recipe.name,brewnote.brewDate
 """
     return query
@@ -20,10 +19,9 @@ LEFT JOIN brewnote ON recipe.id=brewnote.recipe_id
 LEFT JOIN {type}_in_recipe ON {type}_in_recipe.recipe_id=recipe.id
 LEFT JOIN {type} ON {type}.id={type}_in_recipe.{type}_id
 WHERE
-NOT recipe.folder='brewtarget'
-AND recipe.deleted='0'
-AND brewnote.deleted='0'
-GROUP BY brewnote.id
+recipe.deleted='0'
+AND brewnote.display='1'
+GROUP BY brewnote.id,recipe.name
 ORDER BY recipe.name,brewnote.brewDate
 """
     return query

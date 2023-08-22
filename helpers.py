@@ -1,8 +1,7 @@
-import sqlite3 as sql
+import psycopg2
 import pandas as pd
 
 import queries
-import minio_helpers as mh
 
 recipeRounding = {
     'OG': '{:.3f}',
@@ -24,45 +23,72 @@ main_columns = {
 
 delim = "'<br> '"
 ingredient_columns = {
-    f"group_concat(fermentable.name || ' [' || fermentable.amount || ' kg]',{delim})"            : "Fermentable",
-    f"group_concat(hop.name || ' [' || (hop.amount*1000) || ' g @ ' || hop.time || ']',{delim})" : "Hop",
-    f"group_concat(misc.name || ' [' || misc.use|| ' ' || (misc.amount*1000) || ' g]',{delim})"  : "Misc",
-    f"group_concat(yeast.name,{delim})" : "Yeast",
+    f"string_agg(fermentable.name || ' [' || fermentable.amount || ' kg]',{delim})"            : "Fermentable",
+    f"string_agg(hop.name || ' [' || (hop.amount*1000) || ' g @ ' || hop.time || ']',{delim})" : "Hop",
+    f"string_agg(misc.name || ' [' || misc.use|| ' ' || (misc.amount*1000) || ' g]',{delim})"  : "Misc",
+    f"string_agg(yeast.name,{delim})" : "Yeast",
 }
 
 def getRecipies():
 
     # --------------------------------------------------------------------------
-    # Get database from minio
-
-    mh.getDatabaseFile()
-    
-    # --------------------------------------------------------------------------
     # Connect to database
     
-    connection = sql.connect('./database.sqlite')
+    connection = psycopg2.connect(
+        host="localhost",
+        database="brewtarget",
+        user="brewtarget",
+        password="brewtarget")
+
     cursor = connection.cursor()
 
+    # --------------------------------------------------------------------------
+    # Form query for columns of simple parameters
+
+    # Get fields
     displayFields = ','.join(main_columns.keys())
 
+    # Perform query
     query = queries.mainQuery(displayFields)
     main = pd.read_sql_query(query, connection)
+
+    # Extract column names
     column_names = list(main_columns.values())
+
+    # --------------------------------------------------------------------------
+    # Form queries for complex parameters
+    # (many parameters joined in single column)
     
     recipies = main
+
+    # Iterate over paremeters
     for ingredient in ingredient_columns.items():
+        # Fetch amalgamated ingredient details
         query = queries.ingredientQuery(ingredient)
         result = pd.read_sql_query(query, connection)
 
-        recipies = recipies.join(result)
+        # Append to tabular form
+        recipies = pd.concat([recipies,result], axis=1)
         column_names.append(ingredient[1])
 
+    # --------------------------------------------------------------------------
+    # Name table columns
+
     recipies.columns = column_names
+
+    # --------------------------------------------------------------------------
+    # Postprocess datetimes
 
     recipies['Date Brewed'] = pd.to_datetime(recipies['Date Brewed'])
     recipies['Date Brewed'] = recipies['Date Brewed'].dt.strftime('%Y-%m-%d')
 
+    # --------------------------------------------------------------------------
+    # Round values in all columns
+
     recipies = recipies.style.format(recipeRounding).to_html()
+
+    # --------------------------------------------------------------------------
+    # Close db connection
 
     connection.close()
     return recipies
